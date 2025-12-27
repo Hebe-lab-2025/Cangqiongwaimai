@@ -9,6 +9,7 @@ Spring Boot × Frontend Interaction & MVC Architecture
 
 Frontend & backend communicate using HTTP + JSON.
 
+
 🔄 Basic interaction flow
 	1.	Frontend sends HTTP request
 	•	Example: Vue + axios
