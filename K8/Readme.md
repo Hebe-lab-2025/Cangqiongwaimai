@@ -19,4 +19,6 @@ wrong version
 
 ![Service Diagram](https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/K8/images/Kubemini.png)
 
+```
 ![Service Diagram](https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/K8/images/Kubemini.png)
+```
