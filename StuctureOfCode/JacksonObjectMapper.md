@@ -109,7 +109,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 - 前端多传字段
 - 后端实体没有
 - ❌ 不会报错
-- - ✔️ 直接忽略
+- ✔️ 直接忽略
 
 面试常问：why？
 
