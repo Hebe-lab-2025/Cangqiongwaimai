@@ -138,17 +138,17 @@ converters.add(0, converter);
 
 更具体一点：
 ```
-	•	MappingJackson2HttpMessageConverter
-	•	是 Spring MVC 用来处理 JSON ⇆ Java 对象 的核心组件
-	•	默认内部有一个自己的 ObjectMapper
-	•	setObjectMapper(new JacksonObjectMapper())
-	•	把默认的 ObjectMapper 换成你自定义的那个子类：
-	•	忽略未知字段
-	•	自定义时间格式 yyyy-MM-dd HH:mm
-	•	注册 LocalDate/LocalDateTime/LocalTime 序列化器
-	•	converters.add(0, converter);
-	•	插到 索引 0：让它优先级最高
-	•	后面其它 converter（默认的）排在它后面
+- 	MappingJackson2HttpMessageConverter
+- 	是 Spring MVC 用来处理 JSON ⇆ Java 对象 的核心组件
+- 	默认内部有一个自己的 ObjectMapper
+- 	setObjectMapper(new JacksonObjectMapper())
+- 	把默认的 ObjectMapper 换成你自定义的那个子类：
+- 	忽略未知字段
+- 	自定义时间格式 yyyy-MM-dd HH:mm
+- 	注册 LocalDate/LocalDateTime/LocalTime 序列化器
+- 	converters.add(0, converter);
+- 	插到 索引 0：让它优先级最高
+- 	后面其它 converter（默认的）排在它后面
 ```
 
 
@@ -176,7 +176,7 @@ Spring 处理流程（简化）：
 ```
 	1.	Spring 找到 OrderController.submit(@RequestBody OrdersSubmitDTO dto)
 	2.	看到 @RequestBody + Content-Type: application/json
-→ 使用 HttpMessageConverter 列表
+		→ 使用 HttpMessageConverter 列表
 	3.	第一位 converter 就是你加的：
 ```
 
@@ -184,9 +184,9 @@ Spring 处理流程（简化）：
 
 ```
 	4.	这个 converter 使用 JacksonObjectMapper：
-	•	按你定义的日期格式解析 "2025-01-01 18:30" → LocalDateTime
-	•	忽略 JSON 里多余字段
-	•	把 JSON {} 解析成 OrdersSubmitDTO 对象
+- 	按你定义的日期格式解析 "2025-01-01 18:30" → LocalDateTime
+- 	忽略 JSON 里多余字段
+- 	把 JSON {} 解析成 OrdersSubmitDTO 对象
 
 返回响应时也是同样流程，只是方向反过来（Java 对象 → JSON 字符串）。
 ```
@@ -194,11 +194,11 @@ Spring 处理流程（简化）：
 
 3️⃣ 面试话术（可以直接说）
 ```
-In my project, I extend WebMvcConfigurationSupport and override extendMessageConverters.
-I create a MappingJackson2HttpMessageConverter and set a custom JacksonObjectMapper on it,
-which configures global JSON behavior such as date formats and ignoring unknown properties.
-Then I insert this converter at index 0, so Spring MVC will always use my customized ObjectMapper
-for all REST JSON serialization and deserialization.
+- In my project, I extend WebMvcConfigurationSupport and override extendMessageConverters.
+- I create a MappingJackson2HttpMessageConverter and set a custom JacksonObjectMapper on it,
+   which configures global JSON behavior such as date formats and ignoring unknown properties.
+- Then I insert this converter at index 0, so Spring MVC will always use my customized ObjectMapper
+   for all REST JSON serialization and deserialization.
 ```
 ⸻
 
@@ -231,7 +231,7 @@ public ObjectMapper objectMapper() {
 
 如果你愿意，下一步我可以帮你：
 ```
-	•	画一张 “请求 → HttpMessageConverter → Controller” 的时序图（Mermaid）
-	•	或者把 WebMvcConfiguration + JacksonObjectMapper + JwtInterceptor
+- 	画一张 “请求 → HttpMessageConverter → Controller” 的时序图（Mermaid）
+- 	或者把 WebMvcConfiguration + JacksonObjectMapper + JwtInterceptor
 整合成一段 “Web 层基础框架设计” 的英文项目说明。
 ```
