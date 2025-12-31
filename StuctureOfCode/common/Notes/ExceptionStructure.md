@@ -7,6 +7,13 @@
 ```
 ⸻
 
+![exceptions](../../images/exceptions.png)
+
+```
+![exceptions](../../images/exceptions.png)
+```
+
+
 📂 exception 包里现在存的东西（分类说明）
 
 ✅ 1. 通用基础异常（父类）
