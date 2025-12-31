@@ -66,21 +66,17 @@ Hutool 是一个国产 Java 工具库集合
 ⸻
 
 🆚 和你现在用的库的关系
-```
 你现在用	Hutool 可替代吗	说明
 fastjson	✅ 可替代 JSONUtil	二选一即可
 Jackson	⛔ 不完全	Hutool 不是 MVC message converter
 Apache Commons	✅ 很多直接替代	工具丰富
 BeanUtils	✅ 可以替代	更友好
-```
 
 ⸻
 
 🧠 在实际项目中的定位
-```
-👉 Hutool = 工具库
-👉 FastJSON/Jackson = JSON 库
-```
+- 👉 Hutool = 工具库
+- 👉 FastJSON/Jackson = JSON 库
 
 📌 三者不是互斥，是配合关系：
 - Web 返回 JSON → 用 Jackson
@@ -90,20 +86,17 @@ BeanUtils	✅ 可以替代	更友好
 ⸻
 
 ⚠️ 面试必须会说的一句话
-```
+
 Hutool 是国产的 Java 工具类库集合，
 提供了日期、IO、JSON、HTTP、加密、反射等常用封装，
 能显著减少样板代码，提高开发效率，
 在国内项目中非常流行。
-```
 ⸻
 
 🎁 要不要我继续帮你？
 
 我可以：
-```
-1️⃣ 给你一份 Hutool 最常用 API 速查表
-2️⃣ 对比 Hutool vs Apache Commons vs Guava
-3️⃣ 演示 替换 FastJSON → Hutool JSONUtil
-4️⃣ 给你 10 道 Java JSON/工具库相关面试题
-```
+- 1️⃣ 给你一份 Hutool 最常用 API 速查表
+- 2️⃣ 对比 Hutool vs Apache Commons vs Guava
+- 3️⃣ 演示 替换 FastJSON → Hutool JSONUtil
+- 4️⃣ 给你 10 道 Java JSON/工具库相关面试题
