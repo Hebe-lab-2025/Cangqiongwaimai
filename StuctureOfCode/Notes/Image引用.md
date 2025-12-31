@@ -11,9 +11,10 @@
 > 🍔 苍穹外卖 — 项目代码结构 & 异常设计 & 常量约定（示例说明）
 
 ## 📁 目录结构
-
 ```
 
+
+```
 StuctureOfCode/
 ├─ common/
 │  ├─ Notes/
@@ -148,11 +149,13 @@ BaseException <|-- UserNotLoginException
 ✅ **GitHub 图标 badges**  
 
 只要告诉我你的项目技术栈、运行方式、常见命令等细节，我就能补全。
-::contentReference[oaicite:1]{index=1}
+
+```::contentReference[oaicite:1]{index=1}```
+
+
 ```
-
 [1]: https://github.com/Hebe-lab-2025/Cangqiongwaimai "GitHub - Hebe-lab-2025/Cangqiongwaimai"
-
+```
 
 很好，这个问题很常用 👍
 下面用**简单 + 直接可复制**的方式讲清楚：
@@ -302,13 +305,13 @@ https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfC
 ---
 
 ### 📍 使用场景对照
-
+```
 | 引用方式                                                       | 是否适合                        |
 | ---------------------------------------------------------- | --------------------------- |
 | `![…](../../images/exceptions.png)`                        | 👍 相对路径（基于当前 Markdown 文件位置） |
 | `![…](/StuctureOfCode/images/exceptions.png)`              | 👍 仓库内部绝对路径                 |
 | `![…](https://raw.githubusercontent.com/…/exceptions.png)` | 👍 通用，GitHub + 外部平台         |
-
+```
 ---
 
 需要我给出这张图对应的 **Mermaid classDiagram 自动生成版** 或 **更清晰版本适配 README** 吗？
