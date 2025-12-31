@@ -138,8 +138,8 @@ import com.alibaba.fastjson.JSONObject;
 
 只要选一个：
 
-1️⃣ 写 FastJSON ↔ Jackson 对照表
-2️⃣ 讲清楚 FastJSON 安全漏洞风险与防范
-3️⃣ 给你 10 道面试题（Spring JSON 处理）
-4️⃣ 教你写自定义 HttpMessageConverter
-5️⃣ 重构你的项目：统一 JSON 序列化策略
+- 1️⃣ 写 FastJSON ↔ Jackson 对照表
+- 2️⃣ 讲清楚 FastJSON 安全漏洞风险与防范
+- 3️⃣ 给你 10 道面试题（Spring JSON 处理）
+- 4️⃣ 教你写自定义 HttpMessageConverter
+- 5️⃣ 重构你的项目：统一 JSON 序列化策略
