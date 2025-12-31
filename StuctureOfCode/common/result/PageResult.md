@@ -31,11 +31,13 @@ Let’s go through it clearly and simply.
 ✅ What this class is for
 
 PageResult is a DTO used to return:
-```
-Field	Meaning
-total	total number of records in DB that match the query
-records	the list of records for the current page
-```
+
+| Field | Meaning |
+|-------|----------|
+| `total` | total number of records in the database that match the query |
+| `records` | the list of records for the current page |
+
+
 Typical usage scenario:
 - front-end requests page 2, page size 10
 - backend queries DB
