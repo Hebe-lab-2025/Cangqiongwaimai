@@ -33,7 +33,7 @@ public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 ```
-- - -  它们是常量（constant），作用是：
+- 它们是常量（constant），作用是：
 - 日期格式
 - 日期+时间格式
 - 时间格式
@@ -49,7 +49,7 @@ DEFAULT_TIME_FORMAT	只包含时间	18:30:00
 
 🧠 3. 为什么要public static final？
 
-```✔ public```
+```public```
 
 - - -  外部类也能用，例如：
 
@@ -60,14 +60,14 @@ DEFAULT_TIME_FORMAT	只包含时间	18:30:00
 
 ✔ static
 
-- - -  属于类，不属于对象
-- - -  不用 new，也能直接用
+-  属于类，不属于对象
+-  不用 new，也能直接用
 
 ⸻
 
 ✔ final
 
-- - -  不能被修改（常量）
+- 不能被修改（常量）
 
 ```DEFAULT_DATE_FORMAT = "abc"   // ❌ 会报错```
 
@@ -82,7 +82,7 @@ DEFAULT_TIME_FORMAT	只包含时间	18:30:00
 
 🎯 4. 这些常量在哪里用？
 
-- - -  用在下面这段：
+-  用在下面这段：
 
 ```DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)```
 
