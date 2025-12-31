@@ -53,7 +53,6 @@ public class JwtProperties {
 
 🧩 注解逐行解释
 
-#  @Component
 
 # @Component
 
