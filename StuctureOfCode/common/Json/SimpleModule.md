@@ -70,9 +70,14 @@ Java 日期对象 转 JSON 字符串
 
 比如：
 ```
-Java	JSON 输出
-LocalDate.now()	"2025-01-31"
-LocalDateTime.now()	"2025-01-31 18:20"
+
+| JSON 输入 | Java 类型 |
+|-----------|-----------|
+| `"2025-01-31 10:30"` | `LocalDateTime` |
+| `"2025-01-31"` | `LocalDate` |
+| `"10:30:00"` | `LocalTime` |
+
+
 ```
 👉 保持前后端格式完全一致（非常重要）
 
