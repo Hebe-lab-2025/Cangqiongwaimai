@@ -188,13 +188,13 @@ LocalDateTime	2025-01-01 10:30
 ⸻
 
 🧠 面试可答（简洁版）
-
+```
 In my project we create a custom JacksonObjectMapper by extending ObjectMapper.
 We override the default configuration to ignore unknown properties,
 and register custom serializers and deserializers for Java 8 time API such as LocalDateTime.
 This gives us consistent JSON date formats across all controllers without adding annotations everywhere,
 and it demonstrates a real business use of inheritance: customizing framework components while preserving type semantics.
-
+```
 ⸻
 
 👉 如果你愿意，我可以继续帮你
@@ -202,3 +202,131 @@ and it demonstrates a real business use of inheritance: customizing framework co
 - 🧭 画一个 JacksonObjectMapper UML 类图（Mermaid）
 - 🛠 教你如何让它在 Spring Boot 中全局生效（@Bean 配置）
 - 🎯 出 5 道关于 序列化、反序列化、日期格式、ObjectMapper 的面试题
+
+# json中{} 和[] 
+很好，这个问题非常关键 👍——JSON 里的 { } 和 [ ] 表示完全不同的两种数据结构。
+
+⸻
+
+✅ 结论一句话
+```
+- { } 表示对象（Object）——键值对结构
+- [ ] 表示数组（Array）——有顺序的列表
+```
+⸻
+
+```
+🧩 { } —— JSON 对象（key–value）
+
+👉 本质：一组 键值对
+👉 类似 Java 里的 Map / HashMap
+```
+示例
+```
+{
+  "name": "Tom",
+  "age": 18
+}
+```
+
+```
+特点：
+- key 必须是字符串
+- value 可以是：
+- 字符串
+- 数字
+- 布尔
+- null
+- 对象 { }
+- 数组 [ ]
+```
+对应 Java
+```
+class User {
+    String name;
+    int age;
+}
+
+```
+⸻
+```
+🧩 [ ] —— JSON 数组（Array）
+👉 本质：有顺序的列表
+👉 类似 Java 中的 List
+```
+示例
+```
+[
+  "apple",
+  "banana",
+  "orange"
+]
+```
+也可以放对象
+```
+[
+  {"id": 1, "name": "A"},
+  {"id": 2, "name": "B"}
+]
+```
+对应 Java
+
+```List<User>```
+
+
+⸻
+
+🔗 常见组合（面试与开发都高频）
+
+1️⃣ 对象中包含数组
+```
+{
+  "orderId": 1001,
+  "items": [
+    {"name": "burger", "num": 2},
+    {"name": "cola", "num": 1}
+  ]
+}
+```
+👉 订单 + 多个明细
+👉 这就是你的点餐项目里的结构
+
+⸻
+
+2️⃣ 数组中包含对象（列表返回）
+```
+[
+  {"id": 1, "price": 9.9},
+  {"id": 2, "price": 19.9}
+]
+```
+👉 典型：分页、列表、查询结果
+
+⸻
+
+⚠️ 常见易错点
+
+❌ 下面不是合法 JSON
+```
+{name: Tom}
+```
+原因：
+- key 必须带引号 "name"
+
+✔ 正确的是：
+```
+{"name": "Tom"}
+```
+
+⸻
+
+🧠 记忆口诀
+- { } — 像字典 → 对象
+- [ ] — 像数组 → 列表
+
+⸻
+
+👉 如果你愿意，我可以继续帮你：
+- ✅ 把 JSON 和 Java 类型一一对照表做出来
+- ✅ 写几道 JSON → Java 反序列化练习题
+- ✅ 讲清楚：List<VO>、Map<String,Object>、@RequestBody 如何接收 JSON
