@@ -16,18 +16,23 @@ public class ShoppingCartBusinessException extends BaseException { ... }
 
 ```
   1. 继承本质是三句话
+
 	1.	is-a 关系（是一个）
-	•	OrderBusinessException 是一个 BaseException
-	•	ShoppingCartBusinessException 是一个 BaseException
+- 	OrderBusinessException 是一个 BaseException
+- 	ShoppingCartBusinessException 是一个 BaseException
+
+
 	2.	复用父类代码
-	•	子类自动拥有父类的字段、方法
-	•	你不用每个异常都写 message 的构造函数，继承就好了
+- 	子类自动拥有父类的字段、方法
+- 	你不用每个异常都写 message 的构造函数，继承就好了
+
+
 	3.	多态：父类型指向子对象
 
 BaseException e1 = new OrderBusinessException("订单错误");
 BaseException e2 = new ShoppingCartBusinessException("购物车为空");
 
-	•	统一用 BaseException 处理全部业务异常
+- 	统一用 BaseException 处理全部业务异常
 
 一句话：继承 = 代码复用 + 语义表达 + 多态能力，前提是“真的是 is-a”。
 ```
@@ -39,26 +44,30 @@ BaseException e2 = new ShoppingCartBusinessException("购物车为空");
 
 是否适合继承？ 问自己 3 个问题：
 	1.	语义上是不是 is-a？
-	•	✅ “订单业务异常 是 一个 业务异常” → 适合继承
-	•	❌ “购物车 是 一个 订单” → 不对，应该是“订单 有 购物车内容”
+- 	✅ “订单业务异常 是 一个 业务异常” → 适合继承
+- 	❌ “购物车 是 一个 订单” → 不对，应该是“订单 有 购物车内容”
+
+
 	2.	子类能不能在所有场景替代父类使用？（Liskov 替换）
-	•	哪里能用 BaseException，用 OrderBusinessException 都合理吗？合理 → OK
-	•	哪里能用 Order，用 VIPOrder 也合理吗？如果不一定，就要小心
+- 	哪里能用 BaseException，用 OrderBusinessException 都合理吗？合理 → OK
+- 	哪里能用 Order，用 VIPOrder 也合理吗？如果不一定，就要小心
+
+
 	3.	未来扩展会不会很别扭？
-	•	如果后面加很多 if 判断“如果是子类就禁止这个操作”，说明继承设计偏了
+- 	如果后面加很多 if 判断“如果是子类就禁止这个操作”，说明继承设计偏了
 ```
 ⸻
 ```
 1. 继承在你这个项目里的“好例子”
 
 ### ✅ 例 1：异常体系
-	•	父类：BaseException
-	•	子类：OrderBusinessException、ShoppingCartBusinessException、UserNotLoginException…
+- 	父类：BaseException
+- 	子类：OrderBusinessException、ShoppingCartBusinessException、UserNotLoginException…
 
 设计思路：
-	•	语义：“所有这些都是业务异常” → is-a 成立
-	•	需求：需要 统一在 GlobalExceptionHandler 里处理 → 多态刚好满足
-	•	代码：父类统一构造方法，子类只负责“起名 + 区分业务场景”
+- 	语义：“所有这些都是业务异常” → is-a 成立
+- 	需求：需要 统一在 GlobalExceptionHandler 里处理 → 多态刚好满足
+- 	代码：父类统一构造方法，子类只负责“起名 + 区分业务场景”
 
 这个就是非常标准的继承使用方式。
 ```
@@ -85,9 +94,9 @@ public class Dish extends BaseEntity {
 }
 
 设计理由：
-	•	Orders、Dish、Setmeal 等等，都是一种“带审计字段的实体”
-	•	都需要 createTime / updateTime / createUser / updateUser
-	•	把公共部分放到 BaseEntity，其他实体继承 → 减少重复代码
+- 	Orders、Dish、Setmeal 等等，都是一种“带审计字段的实体”
+- 	都需要 createTime / updateTime / createUser / updateUser
+- 	把公共部分放到 BaseEntity，其他实体继承 → 减少重复代码
 ```
 ⸻
 
@@ -99,9 +108,9 @@ public class Dish extends BaseEntity {
 
 ```
 理论上可以，但要看语义：
-	•	如果你认为：“所有购物车异常，本质都属于订单异常的一部分”
+- 	如果你认为：“所有购物车异常，本质都属于订单异常的一部分”
 → 可以：ShoppingCartBusinessException extends OrderBusinessException
-	•	如果你认为：订单异常、购物车异常是两个并列模块
+- 	如果你认为：订单异常、购物车异常是两个并列模块
 → 更自然的是：都继承 BaseException，做兄弟
 
 再看一个典型的错误继承设计：
@@ -109,8 +118,8 @@ public class Dish extends BaseEntity {
 public class ShoppingCart extends Orders { ... }  // ❌ 非常奇怪
 
 现实语义：
-	•	订单：一个完整交易
-	•	购物车：下单前的临时选择
+- 	订单：一个完整交易
+- 	购物车：下单前的临时选择
 
 更合理的是 组合（has-a）：
 
@@ -127,23 +136,23 @@ public class Orders {
 你可以照着这个流程走一遍：
 
 第一步：找“抽象概念”（父类候选）
-	•	业务里有没有“上位概念”？比如：
-	•	所有业务异常 → BaseException
-	•	所有带审计字段的实体 → BaseEntity
-	•	所有订单相关异常 → OrderBusinessException（可选）
+- 	业务里有没有“上位概念”？比如：
+- 	所有业务异常 → BaseException
+- 	所有带审计字段的实体 → BaseEntity
+- 	所有订单相关异常 → OrderBusinessException（可选）
 
 第二步：分类出“具体类型”（子类）
-	•	按业务域拆：
-	•	登录/账号异常 → LoginFailedException、AccountLockedException
-	•	订单异常 → OrderBusinessException
-	•	购物车异常 → ShoppingCartBusinessException
+- 	按业务域拆：
+- 	登录/账号异常 → LoginFailedException、AccountLockedException
+- 	订单异常 → OrderBusinessException
+- 	购物车异常 → ShoppingCartBusinessException
 
 第三步：只把真正通用的代码放在父类
-	•	BaseException 放构造方法、通用属性（比如 errorCode）
-	•	子类只写构造函数、或者以后加自己专属字段
+- 	BaseException 放构造方法、通用属性（比如 errorCode）
+- 	子类只写构造函数、或者以后加自己专属字段
 
 第四步：通过多态统一处理
-	•	用父类类型做方法参数 / 异常捕获，例如：
+- 	用父类类型做方法参数 / 异常捕获，例如：
 
 @ExceptionHandler(BaseException.class)
 public Result handle(BaseException ex) {
@@ -167,8 +176,8 @@ BaseException
 └── ShoppingCartBusinessException
 
 使用：
-	•	全局：捕获 BaseException → 统一返回错误
-	•	局部：需要更细时，可以单独 catch OrderBusinessException
+- 	全局：捕获 BaseException → 统一返回错误
+- 	局部：需要更细时，可以单独 catch OrderBusinessException
 
 适用：订单、购物车是不同 Bounded Context（边界上下文）
 ```
@@ -213,6 +222,6 @@ try {
 
 如果你愿意，下一步我可以帮你做一个：
 ```
-	•	✅ “继承 vs 组合” 对比表（专门用你点餐项目的例子）
-	•	✅ 或者把“异常体系 + BaseException + GlobalExceptionHandler”整理成一段英文项目描述，你可以直接用在简历或面试里。
+- 	✅ “继承 vs 组合” 对比表（专门用你点餐项目的例子）
+- 	✅ 或者把“异常体系 + BaseException + GlobalExceptionHandler”整理成一段英文项目描述，你可以直接用在简历或面试里。
 ```
