@@ -31,7 +31,7 @@ public class BaseException extends RuntimeException {
 ⸻
 
 # 🌳 第二步：定义多个子类（扩展业务）
-
+```
 public class LoginFailedException extends BaseException {
     public LoginFailedException(String msg) {
         super(msg);
@@ -49,7 +49,7 @@ public class PasswordErrorException extends BaseException {
         super(msg);
     }
 }
-
+```
 - 👉 共同点：都继承 BaseException
 - 👉 不需要枚举、常量也能工作（它们只是更优设计，不是必须）
 
