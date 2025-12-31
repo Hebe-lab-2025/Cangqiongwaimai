@@ -1,5 +1,8 @@
 ![Exception 包结构](https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfCode/images/exception.jpg)
 
+```
+![Exception 包结构](https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfCode/images/exception.jpg)
+```
 
 很好，这个问题问得非常关键 👍
 exception 目录是干嘛用的？应该放什么？
