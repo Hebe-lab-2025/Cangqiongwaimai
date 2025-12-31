@@ -152,3 +152,164 @@ BaseException <|-- UserNotLoginException
 ```
 
 [1]: https://github.com/Hebe-lab-2025/Cangqiongwaimai "GitHub - Hebe-lab-2025/Cangqiongwaimai"
+
+
+很好，这个问题很常用 👍
+下面用**简单 + 直接可复制**的方式讲清楚：
+
+---
+
+# 📌 Markdown 引用图片/文件：相对路径 vs 绝对路径
+
+## ✅ 一、相对路径（推荐，随仓库一起移动也不坏）
+
+👉 基于 **当前 Markdown 文件的位置** 计算
+
+### 1）同级目录
+
+```
+![desc](file.jpg)
+```
+
+### 2）当前目录下子文件夹
+
+```
+![desc](images/exception.jpg)
+```
+
+### 3）返回上一级 `..`
+
+```
+![desc](../images/exception.jpg)
+```
+
+### 4）返回两级
+
+```
+![desc](../../images/exception.jpg)
+```
+
+👉 你现在这种结构：
+
+```
+StuctureOfCode/common/Notes/exceptionNotes.md
+StuctureOfCode/images/exception.jpg
+```
+
+正确写法：
+
+```
+![exception](../../images/exception.jpg)
+```
+
+---
+
+## ✅ 二、绝对路径（从仓库根目录开始）
+
+📌 只在 **GitHub 仓库内部**有效（不是 URL）
+
+```
+![exception](/StuctureOfCode/images/exception.jpg)
+```
+
+注意：
+
+* 以 `/` 开头
+* 根目录为仓库根
+
+---
+
+## ✅ 三、GitHub Raw 绝对网址（图片直链）
+
+👉 适合 README anywhere & 外部网站使用
+
+```
+https://raw.githubusercontent.com/用户名/仓库名/分支/路径
+```
+
+你的例子：
+
+```
+https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfCode/images/exception.jpg
+```
+
+Markdown 用法：
+
+```
+![exception](https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfCode/images/exception.jpg)
+```
+
+---
+
+## 🔍 小对比
+
+| 方式     | 说明          | 适合场景         |
+| ------ | ----------- | ------------ |
+| 相对路径   | 随文件移动自动更新   | 推荐大多数情况      |
+| 仓库绝对路径 | 从仓库根写       | README 位于根目录 |
+| raw 直链 | 真正的 HTTP 地址 | 外部网站 / 文档平台  |
+
+---
+
+## 💡 超链接（文件/目录/代码）
+
+### 链接文件
+
+```
+[异常说明](../../images/exception.jpg)
+```
+
+### 链接目录
+
+```
+[查看 images 目录](../../images/)
+```
+
+### 链接到 GitHub 某文件行
+
+```
+https://github.com/user/repo/blob/main/path/file.java#L10-L30
+```
+
+---
+
+如果你愿意 👉 把：
+
+* 你的 README 位置
+* 目标文件路径
+
+发我，我可以 **帮你写出最短正确路径**（100% 不会 404）。
+
+
+这里是你这张图的 **绝对 GitHub 链接（可 Markdown 引用）**：
+
+```
+https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfCode/images/exceptions.png
+```
+
+👇 对应的 **Markdown 引用方式**：
+
+```
+![异常类继承结构](https://raw.githubusercontent.com/Hebe-lab-2025/Cangqiongwaimai/main/StuctureOfCode/images/exceptions.png)
+```
+
+📌 如果你想用 **仓库内部绝对路径（从根开始）**：
+
+```
+![异常类继承结构](/StuctureOfCode/images/exceptions.png)
+```
+
+---
+
+### 📍 使用场景对照
+
+| 引用方式                                                       | 是否适合                        |
+| ---------------------------------------------------------- | --------------------------- |
+| `![…](../../images/exceptions.png)`                        | 👍 相对路径（基于当前 Markdown 文件位置） |
+| `![…](/StuctureOfCode/images/exceptions.png)`              | 👍 仓库内部绝对路径                 |
+| `![…](https://raw.githubusercontent.com/…/exceptions.png)` | 👍 通用，GitHub + 外部平台         |
+
+---
+
+需要我给出这张图对应的 **Mermaid classDiagram 自动生成版** 或 **更清晰版本适配 README** 吗？
+
