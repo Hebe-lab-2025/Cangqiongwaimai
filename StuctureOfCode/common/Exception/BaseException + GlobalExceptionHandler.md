@@ -108,6 +108,8 @@ public class Dish extends BaseEntity {
 你刚刚提到的：
 
 ```“ShoppingCartBusinessException 可以是 OrderBusinessException 的子类吗？”```
+——
+
 
 理论上可以，但要看语义：
 ```
