@@ -233,5 +233,5 @@ public ObjectMapper objectMapper() {
 ```
 - 	画一张 “请求 → HttpMessageConverter → Controller” 的时序图（Mermaid）
 - 	或者把 WebMvcConfiguration + JacksonObjectMapper + JwtInterceptor
-整合成一段 “Web 层基础框架设计” 的英文项目说明。
+	整合成一段 “Web 层基础框架设计” 的英文项目说明。
 ```
