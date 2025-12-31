@@ -84,13 +84,11 @@ Java 日期对象 转 JSON 字符串
 ⸻
 
 🛠 “自定义逻辑”是什么意思？
-```
-Jackson 默认逻辑是：
-- 	LocalDateTime → ISO 标准格式
-2025-01-31T10:30:59.123Z
-- 	你现在改成：
-yyyy-MM-dd HH:mm
-```
+| 项目 | 格式 |
+|------|------|
+| Jackson 默认 LocalDateTime | `2025-01-31T10:30:59.123Z` (ISO-8601) |
+| 你现在自定义格式 | `yyyy-MM-dd HH:mm` |
+
 这就叫：
 
 ✅ 自定义序列化规则
