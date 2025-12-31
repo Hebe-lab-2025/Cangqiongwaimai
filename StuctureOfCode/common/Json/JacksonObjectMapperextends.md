@@ -51,7 +51,7 @@ DEFAULT_TIME_FORMAT	只包含时间	18:30:00
 
 ```public```
 
-- - -  外部类也能用，例如：
+- 外部类也能用，例如：
 
 ```JacksonObjectMapper.DEFAULT_DATE_TIME_FORMAT```
 
