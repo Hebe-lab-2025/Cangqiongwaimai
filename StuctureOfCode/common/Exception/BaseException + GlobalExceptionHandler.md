@@ -37,7 +37,7 @@ BaseException e2 = new ShoppingCartBusinessException("购物车为空");
 - - 统一用 BaseException 处理全部业务异常
 
 一句话：继承 = 代码复用 + 语义表达 + 多态能力，前提是“真的是 is-a”。
-⸻
+——————————————————————————
 
 # 二、在真实业务里：如何设计继承？
 
@@ -57,7 +57,7 @@ BaseException e2 = new ShoppingCartBusinessException("购物车为空");
 - 3.- 未来扩展会不会很别扭？
 - - 如果后面加很多 if 判断“如果是子类就禁止这个操作”，说明继承设计偏了
 ```
-⸻
+——————————————————————————
 ```
 1. 继承在你这个项目里的“好例子”
 
@@ -74,7 +74,7 @@ BaseException e2 = new ShoppingCartBusinessException("购物车为空");
 
 这个就是非常标准的继承使用方式。
 ```
-⸻
+——————————————————————————
 
 ### ✅ 例 2：公共实体基类（你项目里也很常见）
 ```
@@ -101,7 +101,7 @@ public class Dish extends BaseEntity {
 - - 都需要 createTime / updateTime / createUser / updateUser
 - - 把公共部分放到 BaseEntity，其他实体继承 → 减少重复代码
 ```
-⸻
+——————————————————————————
 
 2. 哪些情况“不要用继承，用组合（has-a）更好”？
 
@@ -131,7 +131,7 @@ public class Orders {
 }
 ```
 口诀：“是一个”用继承，“有一个”用组合。
-⸻
+——————————————————————————
 
 3. 设计继承时的实战步骤（面向业务）
 你可以照着这个流程走一遍：
@@ -161,11 +161,11 @@ public Result handle(BaseException ex) {
 }
 
 ```
-⸻
+——————————————————————————
 
 4. 一个“继承 + 设计”完整小例子（基于你现在的项目）
 **目标：**设计“订单相关异常层级”，并考虑是否让购物车异常成为子类。
-
+——————————————————————————
 # 方案 A：并列（当前实际做法）
 ```
 RuntimeException
@@ -175,14 +175,14 @@ BaseException
 ├── OrderBusinessException
 └── ShoppingCartBusinessException
 ```
-
+——————————————————————————
 # 使用：
 - - 全局：捕获 BaseException → 统一返回错误
 - - 局部：需要更细时，可以单独 catch OrderBusinessException
 
 适用：订单、购物车是不同 Bounded Context（边界上下文）
 
-⸻
+——————————————————————————
 
 # 方案 B：分层（父子关系）
 ```
@@ -194,6 +194,7 @@ OrderBusinessException
    ↑
 ShoppingCartBusinessException
 ```
+——————————————————————————
 使用：
 ```
 try {
