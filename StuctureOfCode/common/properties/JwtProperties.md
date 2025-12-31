@@ -186,9 +186,13 @@ String token = JwtUtil.createJWT(
 ```
 - We externalize JWT configuration using @ConfigurationProperties.
 
-- The JwtProperties class binds to the sky.jwt prefix and holds two independent token configurations: admin-side and user-side.
+- The JwtProperties class binds to the sky.jwt prefix
+   and holds two independent token configurations:
+   admin-side and user-side.
 
-- This supports different secrets, token names, and expiration policies, avoids hardcoding security credentials, and improves maintainability and security.
+- This supports different secrets, token names, and expiration policies,
+   avoids hardcoding security credentials,
+   and improves maintainability and security.
 ```
 ⸻
 
