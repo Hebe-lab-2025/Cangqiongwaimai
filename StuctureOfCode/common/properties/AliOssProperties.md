@@ -88,13 +88,13 @@ sky:
 ```
 Spring 会自动映射到：
 
-```
-yml key	Java field
-endpoint	endpoint
-accessKeyId	accessKeyId
-accessKeySecret	accessKeySecret
-bucketName	bucketName
-```
+| yml key | Java field |
+|---------|-------------|
+| `endpoint` | `endpoint` |
+| `accessKeyId` | `accessKeyId` |
+| `accessKeySecret` | `accessKeySecret` |
+| `bucketName` | `bucketName` |
+
 
 ⸻
 
