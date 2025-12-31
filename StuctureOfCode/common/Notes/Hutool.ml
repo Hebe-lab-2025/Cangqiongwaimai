@@ -66,7 +66,6 @@ Hutool 是一个国产 Java 工具库集合
 ⸻
 
 🆚 和你现在用的库的关系
-
 ```
 你现在用	Hutool 可替代吗	说明
 fastjson	✅ 可替代 JSONUtil	二选一即可
