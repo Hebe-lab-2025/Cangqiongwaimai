@@ -100,7 +100,7 @@ public class Dish extends BaseEntity {
 - - Orders、Dish、Setmeal 等等，都是一种“带审计字段的实体”
 - - 都需要 createTime / updateTime / createUser / updateUser
 - - 把公共部分放到 BaseEntity，其他实体继承 → 减少重复代码
-```
+
 ——————————————————————————
 
 2. 哪些情况“不要用继承，用组合（has-a）更好”？
@@ -118,6 +118,8 @@ public class Dish extends BaseEntity {
 - - 如果你认为：订单异常、购物车异常是两个并列模块
 → 更自然的是：都继承 BaseException，做兄弟
 ```
+————————————
+
 再看一个典型的错误继承设计：
 
 ```public class ShoppingCart extends Orders { ... }  // ❌ 非常奇怪```
