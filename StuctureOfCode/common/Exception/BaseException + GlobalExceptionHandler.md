@@ -79,7 +79,7 @@ BaseException e2 = new ShoppingCartBusinessException("购物车为空");
 ### ✅ 例 2：公共实体基类（你项目里也很常见）
 ```
 很多项目会这样：
-
+```
 public class BaseEntity {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
@@ -95,7 +95,7 @@ public class Orders extends BaseEntity {
 public class Dish extends BaseEntity {
     // 自己的业务字段
 }
-
+```
 设计理由：
 - - Orders、Dish、Setmeal 等等，都是一种“带审计字段的实体”
 - - 都需要 createTime / updateTime / createUser / updateUser
