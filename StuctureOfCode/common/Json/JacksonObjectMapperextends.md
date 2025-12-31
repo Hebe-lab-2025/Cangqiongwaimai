@@ -15,7 +15,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 
 ```public class JacksonObjectMapper extends ObjectMapper {```
 
-- - -  含义：
+- 含义：
 - 你创建了 Jackson 的子类
 - 继承自 ObjectMapper
 - 目的是：在里面写自己的默认序列化/反序列化规则
