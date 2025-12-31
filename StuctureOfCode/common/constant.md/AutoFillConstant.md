@@ -38,7 +38,7 @@ public class AutoFillConstant {
 
 ❌ 不能：
 
-AutoFillConstant.SET_CREATE_TIME = "abc"; // 编译直接报错
+```AutoFillConstant.SET_CREATE_TIME = "abc"; // 编译直接报错```
 
 
 ⸻
@@ -49,11 +49,11 @@ AutoFillConstant.SET_CREATE_TIME = "abc"; // 编译直接报错
 
 - 👉 使用方式：
 
-AutoFillConstant.SET_CREATE_TIME
+```AutoFillConstant.SET_CREATE_TIME```
 
 无需：
 
-new AutoFillConstant()
+```new AutoFillConstant()```
 
 
 ⸻
@@ -70,7 +70,7 @@ new AutoFillConstant()
 
 ❌ 坏例子（魔法字符串）：
 
-method.invoke(obj, "setCreateTime");
+```method.invoke(obj, "setCreateTime");```
 
 ⚠️ 一旦写错：setCreatTime → 运行时才报错
 
@@ -78,7 +78,7 @@ method.invoke(obj, "setCreateTime");
 
 ✅ 好例子（常量）：
 
-method.invoke(obj, AutoFillConstant.SET_CREATE_TIME);
+```method.invoke(obj, AutoFillConstant.SET_CREATE_TIME);```
 
 - ✔ IDE 自动提示
 - ✔ 不会写错
@@ -89,7 +89,7 @@ method.invoke(obj, AutoFillConstant.SET_CREATE_TIME);
 
 🛡️ 总结一句话
 
-public static final 的变量 = Java 常量
+```public static final 的变量 = Java 常量```
 - 👉 属于类
 - 👉 只能赋值一次
 - 👉 值不可变
