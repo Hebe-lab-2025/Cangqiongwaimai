@@ -3,7 +3,7 @@
 
 ⸻
 
-🧩 这段代码在做什么？
+# 🧩 这段代码在做什么？
 
 你创建了一个 常量类：
 
@@ -16,6 +16,7 @@ public class AutoFillConstant {
     public static final String SET_UPDATE_USER = "setUpdateUser";
 }
 ```
+
 主要作用：
 - 存放公共常量
 - 用来统一管理字符串，避免魔法字符串（magic string）
@@ -26,11 +27,11 @@ public class AutoFillConstant {
 
 🧠 为什么用 public static final？
 
-1️⃣ final：不能被修改
+# 1️⃣ final：不能被修改
 - final 修饰一个变量 → 值只能被赋一次
 - 一旦赋值成功 → 不可再改变
 
-👉 目的：
+- 👉 目的：
 - 防止程序员手滑修改
 - 保证全系统使用同一个固定值
 - 提升代码安全性 & 可读性
@@ -42,11 +43,11 @@ AutoFillConstant.SET_CREATE_TIME = "abc"; // 编译直接报错
 
 ⸻
 
-2️⃣ static：属于类，不属于对象
+# 2️⃣ static：属于类，不属于对象
 - 不需要 new 对象
 - 直接用类名访问
 
-👉 使用方式：
+- 👉 使用方式：
 
 AutoFillConstant.SET_CREATE_TIME
 
@@ -57,13 +58,13 @@ new AutoFillConstant()
 
 ⸻
 
-3️⃣ public：全局共享
+# 3️⃣ public：全局共享
 - 任何包、任何类都可以访问
 - 非常适合“常量中心”
 
 ⸻
 
-🏷️ 为什么要用常量（而不是直接写字符串）？
+# 🏷️ 为什么要用常量（而不是直接写字符串）？
 
 对比：
 
@@ -79,21 +80,21 @@ method.invoke(obj, "setCreateTime");
 
 method.invoke(obj, AutoFillConstant.SET_CREATE_TIME);
 
-✔ IDE 自动提示
-✔ 不会写错
-✔ 统一管理
-✔ 修改只改一处
+- ✔ IDE 自动提示
+- ✔ 不会写错
+- ✔ 统一管理
+- ✔ 修改只改一处
 
 ⸻
 
 🛡️ 总结一句话
 
 public static final 的变量 = Java 常量
-👉 属于类
-👉 只能赋值一次
-👉 值不可变
-👉 全局共享
-👉 非常适合存 setter、状态码、字符串标识等
+- 👉 属于类
+- 👉 只能赋值一次
+- 👉 值不可变
+- 👉 全局共享
+- 👉 非常适合存 setter、状态码、字符串标识等
 
 ⸻
 
