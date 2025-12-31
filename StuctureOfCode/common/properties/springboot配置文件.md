@@ -177,9 +177,17 @@ sky:
 
 🎯 七、总结一句话（面试必背）
 ```
-Spring Boot uses application.yml or application.properties to externalize configuration.
-We can define multiple environment-specific files such as application-dev.yml and application-prod.yml, and activate them using spring.profiles.active.
-Configuration values can be injected using @Value or bound to POJO classes using @ConfigurationProperties, which is recommended for structured configuration.
+- Spring Boot uses application.yml or application.properties
+to externalize configuration.
+
+- We can define multiple environment-specific files such as application-dev.yml
+
+and application-prod.yml, and activate them using spring.profiles.active.
+
+- Configuration values can be injected using @Value or bound
+to POJO classes using @ConfigurationProperties,
+
+- which is recommended for structured configuration.
 ```
 ⸻
 
