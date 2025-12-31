@@ -1,6 +1,12 @@
 很好，这里说的就是 多态（polymorphism）：
 - 👉 “子类对象可以被当作父类类型来使用”。
 
+
+![exceptions](../../images/exceptions.png)
+
+```
+![exceptions](../../images/exceptions.png)
+```
 我们直接用你项目里的异常体系举例。
 
 ⸻
