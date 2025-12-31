@@ -6,7 +6,11 @@
 
 很好，这个问题问得非常关键 👍
 exception 目录是干嘛用的？应该放什么？
+![exception](StuctureOfCode/images/exception.jpg)
 
+```
+![exception](StuctureOfCode/images/exception.jpg)
+```
 ⸻
 
 ✅ 一句话说明
