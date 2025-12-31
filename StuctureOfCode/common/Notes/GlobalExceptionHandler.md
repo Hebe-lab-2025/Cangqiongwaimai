@@ -159,28 +159,42 @@ It keeps error handling unified, reduces duplicate code, and still keeps clear s
 
 👉 一句话答案：因为“统一管理 + 一次捕获所有业务异常”
 
-🧠 通俗理解
+### 🧠 通俗理解
+```
+- 没有 BaseException：到处是各种异常，难收拾
+- 有 BaseException：所有业务异常都有同一个“爸爸”
+```
 
-没有 BaseException：到处是各种异常，难收拾
 
-有 BaseException：所有业务异常都有同一个“爸爸”
+### ✅ 这样做的好处
+```
+- 全部业务异常 👉 同一个大类型
 
-✅ 这样做的好处
+- 全局异常处理器只写一次 @ExceptionHandler(BaseException.class)
 
-全部业务异常 👉 同一个大类型
+- 所有业务异常统一格式返回
 
-全局异常处理器只写一次 @ExceptionHandler(BaseException.class)
+- 代码不乱，逻辑清晰
+```
 
-所有业务异常统一格式返回
+### 🗣️ 面试可说这样
+```
+- 我会设计一个 BaseException 继承 RuntimeException，
+- 所有业务异常继承 BaseException。
+- 这样全局异常处理器只需要捕获 BaseException 一次，
+- 就可以统一处理所有业务异常，做到风格一致、代码复用和语义清晰。
+```
 
-代码不乱，逻辑清晰
+| 分类 | 内容 |
+|------|------|
+| 没有 BaseException | 到处是各种异常，难统一处理 |
+| 有 BaseException | 所有业务异常都有同一个“父类” |
+| 好处 1 | 全部业务异常属于同一大类型 |
+| 好处 2 | 全局异常处理器只写一次 `@ExceptionHandler(BaseException.class)` |
+| 好处 3 | 所有业务异常统一返回格式 |
+| 好处 4 | 代码结构清晰，逻辑更干净 |
+| 面试表达 | 我设计 BaseException 继承 RuntimeException，并让所有业务异常继承它，通过全局异常处理器统一捕获和处理，既统一风格也提高复用性与可维护性 |
 
-🗣️ 面试可说这样
-
-我会设计一个 BaseException 继承 RuntimeException，
-所有业务异常继承 BaseException。
-这样全局异常处理器只需要捕获 BaseException 一次，
-就可以统一处理所有业务异常，做到风格一致、代码复用和语义清晰。
 
 
 ⸻
@@ -188,41 +202,40 @@ It keeps error handling unified, reduces duplicate code, and still keeps clear s
 ## Q2. 你怎么解释“子类可以当作父类使用”（多态），用你的异常体系举例？
 
 参考回答：
-
+```
 With inheritance, a child class object can be referenced by a parent type.
 For example, BaseException e = new OrderBusinessException("order error"); is valid,
 because OrderBusinessException extends BaseException.
 In our global exception handler, we use @ExceptionHandler(BaseException.class) to catch all subclasses,
 such as OrderBusinessException, ShoppingCartBusinessException, and AccountLockedException.
 This is a practical use of polymorphism in our exception system.
-
+```
 ✅ Q2. 什么叫“子类可以当作父类使用”？用你的异常举例
 
 👉 关键词：多态
 
 🧠 通俗解释
-
-儿子是人类
-
-叫“人”也没问题
-👉 但是“人”不一定都是儿子
+- 儿子是人类
+- 叫“人”也没问题
+- 👉 但是“人”不一定都是儿子
 
 ✅ 在你的异常体系中
-BaseException e = new OrderBusinessException("order error");
+```BaseException e = new OrderBusinessException("order error");```
 
 
 ✔ 合法
 ✔ 因为：
 
-OrderBusinessException 继承 BaseException
+```OrderBusinessException 继承 BaseException```
 
 🧰 在全局异常处理中的真实用法
+```
 @ExceptionHandler(BaseException.class)
 public Result handle(BaseException ex) { ... }
-
+```
 
 👉 能捕获：
-
+```
 OrderBusinessException
 
 ShoppingCartBusinessException
@@ -232,22 +245,22 @@ AccountLockedException
 PasswordErrorException
 
 …
-
+```
 🗣️ 面试可这样说
-
+```
 多态意味着子类对象可以用父类类型来引用。
 在我的项目中，BaseException 是父类，
 所有业务异常是子类。
 全局异常处理器使用 @ExceptionHandler(BaseException.class)，
 就可以一次性捕获所有业务异常，这是多态的具体应用。
-
+```
 
 ⸻
 
 ## Q3. 业务异常和系统异常，你是怎么区分和处理的？
 
 参考回答：
-
+```
 I separate business exceptions from system exceptions.
 All business rule violations, like “order status error” or “cart is empty”,
 throw subclasses of BaseException.
@@ -257,6 +270,7 @@ I let them fall into a more general Exception handler that logs the full stack t
 and returns a generic “internal server error” message.
 This way, clients get meaningful messages for business issues,
 while internal errors are logged but not exposed.
+```
 
 ✅ Q3. 业务异常 和 系统异常 怎么区分？
 🧠 通俗解释
@@ -265,29 +279,28 @@ while internal errors are logged but not exposed.
 系统异常	空指针、数据库挂了	系统自己坏了
 ✅ 我的做法
 
-业务异常 👉 BaseException 子类
-
-系统异常 👉 让它抛出去，统一兜底
+- 业务异常 👉 BaseException 子类
+- 系统异常 👉 让它抛出去，统一兜底
 
 🛠 处理策略
 
-业务异常：提示清晰业务信息
+- 业务异常：提示清晰业务信息
 
-系统异常：记录日志 ❗ 不把细节暴露给用户
+- 系统异常：记录日志 ❗ 不把细节暴露给用户
 
 🗣️ 面试可说
-
+```
 业务异常是规则被违反，例如订单状态不合法；
 系统异常是非预期错误，例如空指针、数据库连接失败。
 我会用 BaseException 体系处理业务异常，
 系统异常使用 Exception 兜底，记录日志但不暴露内部信息。
-
+```
 ⸻
 
 ## Q4. 为什么不直接用 RuntimeException，而要定义很多自定义异常类？
 
 参考回答：
-
+```
 Using only RuntimeException makes error handling too coarse-grained.
 You cannot distinguish a login failure from an order status error just by the type.
 By defining custom exceptions like LoginFailedException, OrderBusinessException, and UserNotLoginException,
@@ -295,48 +308,49 @@ I can express the business intent directly in the type,
 and I can also apply more fine-grained handling if needed.
 For example, I could log login failures differently from payment errors.
 It improves readability, maintainability, and makes the code self-documenting.
+```
 
 ✅ Q4. 为什么不全用 RuntimeException？
 
-👉 因为：太笼统，没有语义
+- 👉 因为：太笼统，没有语义
 
-❌ 全用 RuntimeException 会怎样？
+- ❌ 全用 RuntimeException 会怎样？
 
-无法区分：
+### 无法区分：
 
-登录失败
+- 登录失败
 
-订单错误
+- 订单错误
 
-购物车为空
+- 购物车为空
 
-日志没法分类
+- 日志没法分类
 
-很难维护
+- 很难维护
 
-✅ 自定义异常的好处
+### ✅ 自定义异常的好处
 
-LoginFailedException
+- LoginFailedException
 
-OrderBusinessException
+- OrderBusinessException
 
-UserNotLoginException
+- UserNotLoginException
 
-👉 一看名字就知道发生什么
-👉 代码 = 自文档
+- 👉 一看名字就知道发生什么
+- 👉 代码 = 自文档
 
 🗣️ 面试可说
-
+```
 只用 RuntimeException 太粗糙，语义不清晰。
 我定义了多个业务异常类来表达具体业务含义，
 既提升了可读性，也方便做精细化日志与分类处理。
-
+```
 ⸻
 
 ## Q5. 在 Spring 项目中，你如何用全局异常处理配合自定义异常？
 
 参考回答：
-
+```
 In Spring, I use @RestControllerAdvice combined with @ExceptionHandler.
 First, I create a BaseException and let all business exceptions extend it.
 Then I write a GlobalExceptionHandler like:
@@ -345,56 +359,61 @@ and return Result.error(ex.getMessage()).
 I also add another @ExceptionHandler(Exception.class) as a fallback for unknown system errors.
 This pattern centralizes error handling, keeps controllers clean,
 and ensures that the API always returns a consistent error format.
-
+```
 ⸻
-
+```
 如果你愿意，下一步我可以帮你：
 	•	把你现在的 异常体系 + GlobalExceptionHandler + Result 组合成一页“项目总结”
 	•	或者帮你写一段 “我在项目里是怎么设计异常系统的” 英文长回答，可以直接用在面试里 🌟
+```
+
+——————
 
 ```
 ✅ Q5. 在 Spring 项目里如何全局处理自定义异常？
 
-👉 关键：@RestControllerAdvice
+- 👉 关键：@RestControllerAdvice
 
-🛠 实际套路
+- 🛠 实际套路
 
-建 BaseException
+- 建 BaseException
 
-所有业务异常继承它
+- 所有业务异常继承它
 
-写 GlobalExceptionHandler
+- 写 GlobalExceptionHandler
 
 🌟 示例思路（不用写代码也能讲）
 
-业务异常处理器：
+- 业务异常处理器：
 
-@ExceptionHandler(BaseException.class)
+- @ExceptionHandler(BaseException.class)
 → 返回明确的业务提示
 
 
-系统异常处理器：
+- 系统异常处理器：
 
 @ExceptionHandler(Exception.class)
 → 记录日志，返回通用错误
+```
 
-🗣️ 面试可说
+### 🗣️ 面试可说
 
-我会用 @RestControllerAdvice + @ExceptionHandler
-捕获 BaseException 统一处理业务异常，
-另外加一个 Exception 兜底，处理未知系统异常，
-保证接口返回格式统一，同时保护系统内部信息。
+- 我会用 @RestControllerAdvice + @ExceptionHandler
+- 捕获 BaseException 统一处理业务异常，
+- 另外加一个 Exception 兜底，处理未知系统异常，
+- 保证接口返回格式统一，同时保护系统内部信息。
 
 🎁 如果你愿意，我可以继续帮你：
+```
+- ⭐ 把这些整理成 一页面试速记 PDF 风格内容
 
-⭐ 把这些整理成 一页面试速记 PDF 风格内容
+- ⭐ 直接写成 英文长回答，可背诵
 
-⭐ 直接写成 英文长回答，可背诵
-
-⭐ 给你一套 面试官和你的模拟问答
+- ⭐ 给你一套 面试官和你的模拟问答
 ```
 
-```
+
+
 太好了 👍
 我先给你一份 **英文长回答（可直接在面试里说）**，把 Q1–Q5 串成一段完整回答；再附上 **中文速记版**，你可以背诵或做笔记。
 
@@ -438,22 +457,22 @@ I do not use only RuntimeException because it is too coarse-grained. Using dedic
 
 ### ⭐ 为什么不用 RuntimeException？
 
-* 语义不清晰 ❌
-* 无法细分业务 ❌
-* 日志不好分类 ❌
-  👉 自定义异常 = 代码自解释 ✔
+- * 语义不清晰 ❌
+- * 无法细分业务 ❌
+- * 日志不好分类 ❌
+-   👉 自定义异常 = 代码自解释 ✔
 
 ### ⭐ 在 Spring 里怎么配合？
 
-* `@RestControllerAdvice`
-* `@ExceptionHandler(BaseException.class)` 业务异常
-* `@ExceptionHandler(Exception.class)` 系统异常兜底
+- * `@RestControllerAdvice`
+- * `@ExceptionHandler(BaseException.class)` 业务异常
+- * `@ExceptionHandler(Exception.class)` 系统异常兜底
 
 ---
 
 # 📄 你要哪个下一步？
-
-我可以继续帮你（任选一项或多选）👇
+```
+- 我可以继续帮你（任选一项或多选）👇
 
 1️⃣ 生成 **一页纸 PDF 风格总结文本**
 2️⃣ 生成 **Markdown 版“异常设计总结”直接放到 GitHub**
@@ -466,7 +485,7 @@ I do not use only RuntimeException because it is too coarse-grained. Using dedic
 ```
 太棒了 👍
 我一次性把 **1–5 全部给你准备好**，你可直接用、直接粘 GitHub、直接背面试。
-
+```
 ---
 
 # 🧾 1️⃣ 一页纸 PDF 风格总结文本（可直接生成 PDF）
@@ -485,13 +504,13 @@ Provide a unified, readable and maintainable exception-handling mechanism for bu
 ---
 
 ## 🧩 Core Idea
-
+```
 * Define a **BaseException**
 * All **business exceptions extend BaseException**
 * Use **GlobalExceptionHandler** to统一处理
 * Separate **business exceptions** and **system exceptions**
 * Ensure API error responses remain **consistent and meaningful**
-
+```
 ---
 
 ## 🏗 Exception Hierarchy
@@ -512,36 +531,36 @@ Business sub-exceptions
 ---
 
 ## 🧠 Why BaseException?
-
+```
 * One root type for business errors
 * Enables **polymorphism**
 * Allows **global capture with single handler**
 * Improves code reuse & clarity
 * Keeps controller code clean
-
+```
 ---
 
 ## 🔍 Business vs System Exceptions
-
+```
 | Type               | Examples                           | Handling Strategy                          |
 | ------------------ | ---------------------------------- | ------------------------------------------ |
 | Business Exception | order status invalid, login failed | return clear business message              |
 | System Exception   | NPE, DB down, server crash         | log full detail, generic message to client |
-
+```
 ---
 
 ## 🧭 Key Concepts
-
+```
 * Inheritance
 * Polymorphism
 * Separation of concerns
 * Global exception handling
 * API consistency
-
+```
 ---
 
 ## 🛠 Implementation Recipe
-
+``
 1. Create `BaseException extends RuntimeException`
 2. Create domain-specific subclasses
 3. Implement `@RestControllerAdvice`
@@ -550,25 +569,25 @@ Business sub-exceptions
    * `@ExceptionHandler(BaseException.class)`
    * `@ExceptionHandler(Exception.class)`
 5. Return unified `Result<T>` response format
-
+``
 ---
 
 ## ⭐ Benefits
-
+```
 * Semantic clarity
 * Centralized handling
 * Safer API exposure
 * Maintainability
 * Extensibility
-
+```
 ---
 
 ## 🧾 Takeaway Statement
-
+```
 > A unified exception system with BaseException + GlobalExceptionHandler
 > helps isolate business errors from system errors,
 > keeps controllers simple, and ensures a consistent API contract.
-
+```
 ---
 
 # 📚 2️⃣ Markdown 版《异常设计总结》（直接放 GitHub）
@@ -612,10 +631,10 @@ BaseException <|-- UserNotLoginException
 ```java
 BaseException e = new OrderBusinessException("order error");
 ```
-
+```
 @ExceptionHandler(BaseException.class)
 → automatically catches all subclasses
-
+```
 ---
 
 ## 🔍 Business vs System Exception
@@ -628,11 +647,11 @@ BaseException e = new OrderBusinessException("order error");
 ---
 
 ## 🛠 Global Exception Handling Pattern
-
+```
 * `@RestControllerAdvice`
 * `@ExceptionHandler(BaseException.class)` → business
 * `@ExceptionHandler(Exception.class)` → system fallback
-
+```
 ---
 
 ## 🧾 Key Benefit Summary
@@ -651,7 +670,7 @@ BaseException e = new OrderBusinessException("order error");
 ---
 
 # 🎤 3️⃣ 模拟面试对话（你是候选人）
-
+```
 **面试官：** Why did you design a BaseException in your project?  
 **你：**  
 I wanted to have a unified root type for all business exceptions,  
@@ -659,35 +678,38 @@ so I created a BaseException extending RuntimeException,
 and made all business exceptions extend it.  
 This allows my global exception handler to catch BaseException once  
 and handle all business errors consistently.
-
+```
 ---
 
 **面试官：** How does your design use polymorphism?  
-**你：**  
+**你：**
+```
 Polymorphism allows child objects to be referenced as parent types.  
 In my project, any subclass of BaseException  
 can be caught by `@ExceptionHandler(BaseException.class)`.  
 So OrderBusinessException, ShoppingCartBusinessException, etc.  
 are all handled automatically by the same method.
-
+```
 ---
 
 **面试官：** How do you distinguish business and system exceptions?  
-**你：**  
+**你：**
+```
 Business exceptions are rule violations such as invalid order status.  
 System exceptions are unexpected technical failures.  
 I throw BaseException subclasses for business errors  
 and let system exceptions fall into a generic handler  
 that logs the full stack trace and returns a safe message.
-
+```
 ---
 
 **面试官：** Why not just use RuntimeException?  
-**你：**  
+**你：**
+```
 Because it is too coarse-grained.  
 Custom exception classes let me express business intent clearly,  
 enable fine-grained handling and logging, and keep code self-documenting.
-
+```
 ---
 
 # 🧩 4️⃣ 代码模板（BaseException + GlobalHandler + Result）
