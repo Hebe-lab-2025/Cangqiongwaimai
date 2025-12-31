@@ -9,16 +9,24 @@
 
 场景	FastJSON	Jackson	说明
 ```
-对象 ➜ JSON 字符串	JSON.toJSONString(obj)	objectMapper.writeValueAsString(obj)	FastJSON 工具方法风格；Jackson 依赖 ObjectMapper 实例
-JSON 字符串 ➜ 对象	JSON.parseObject(str, User.class)	objectMapper.readValue(str, User.class)	常见反序列化
-JSON 字符串 ➜ List	JSON.parseArray(str, User.class)	objectMapper.readValue(str, new TypeReference<List<User>>() {})	集合在 Jackson 里要用 TypeReference
-动态 JSON 对象	JSONObject obj = JSON.parseObject(str)	JsonNode node = objectMapper.readTree(str)	JSONObject vs JsonNode
-动态 JSON 数组	JSONArray arr = JSON.parseArray(str)	ArrayNode arr = (ArrayNode) objectMapper.readTree(str)	两者都是树模型
-忽略未知字段	默认宽松，可配 Feature	mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false)	你在 JacksonObjectMapper 里已经这样配了
-自定义日期格式	@JSONField(format = "yyyy-MM-dd HH:mm:ss") 或全局配置	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") 或自定义 ObjectMapper	两者都支持注解 + 全局配置
-Spring MVC 默认集成	❌ 不是默认	✅ 默认（MappingJackson2HttpMessageConverter）	Spring Boot 默认用 Jackson
+- 对象 ➜ JSON 字符串	JSON.toJSONString(obj)	objectMapper.writeValueAsString(obj)	FastJSON 工具方法风格；Jackson 依赖 ObjectMapper 实例
+
+- JSON 字符串 ➜ 对象	JSON.parseObject(str, User.class)	objectMapper.readValue(str, User.class)	常见反序列化
+
+- JSON 字符串 ➜ List	JSON.parseArray(str, User.class)	objectMapper.readValue(str, new TypeReference<List<User>>() {})	集合在 Jackson 里要用 TypeReference
+
+- 动态 JSON 对象	JSONObject obj = JSON.parseObject(str)	JsonNode node = objectMapper.readTree(str)	JSONObject vs JsonNode
+
+- 动态 JSON 数组	JSONArray arr = JSON.parseArray(str)	ArrayNode arr = (ArrayNode) objectMapper.readTree(str)	两者都是树模型
+
+- 忽略未知字段	默认宽松，可配 Feature	mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false)	你在 JacksonObjectMapper 里已经这样配了
+
+- 自定义日期格式	@JSONField(format = "yyyy-MM-dd HH:mm:ss") 或全局配置	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") 或自定义 ObjectMapper	两者都支持注解 + 全局配置
+
+- Spring MVC 默认集成	❌ 不是默认	✅ 默认（MappingJackson2HttpMessageConverter）	Spring Boot 默认用 Jackson
 中文社区	很多（国内用得多）	也很多	
-历史安全问题	多次 RCE 漏洞（autoType）	相对更稳定	下面单独讲
+
+- 历史安全问题	多次 RCE 漏洞（autoType）	相对更稳定	下面单独讲
 ```
 
 ⸻
