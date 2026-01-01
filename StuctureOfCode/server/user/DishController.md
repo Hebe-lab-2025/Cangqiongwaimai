@@ -367,3 +367,5 @@ GET /user/dish/list?categoryId=3
 * ✔ Spring Cache 注解版实现（@Cacheable）
 * ✔ 全链路图（Controller → Service → DB → Redis）
 
+
+
