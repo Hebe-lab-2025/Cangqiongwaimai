@@ -1,5 +1,6 @@
 
 
+71b4a49 (update Notes/cat.md)
 很好，这个问题问得非常好 👍
 你刚才看到的这一段，其实是 **Linux / macOS 里的“多行写文件”语法**，叫做 **heredoc（here document）**。
 我用一句话概括：
