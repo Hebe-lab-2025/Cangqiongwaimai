@@ -35,6 +35,7 @@ public class UserController {
      * @param userLoginDTO
      * @return
      */
+    // http://localhost:8080/user/user/login?
     @PostMapping("/login")
     @ApiOperation("微信登录")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
