@@ -836,8 +836,831 @@ public class CategoryController {
 
 如果你愿意，下一步我可以帮你：
 
-1️⃣ 逐行解释 `CategoryService` 实现（包含「有菜品不能删」那种业务逻辑）
-2️⃣ 把这段 Controller 改成 **带校验注解** 的版本（`@Valid`、`@NotBlank` 等）
-3️⃣ 画一张「前端请求 → Controller → Service → Mapper → DB」时序图（用文字或 mermaid）
+- 1️⃣ 逐行解释 `CategoryService` 实现（包含「有菜品不能删」那种业务逻辑）
+- 2️⃣ 把这段 Controller 改成 **带校验注解** 的版本（`@Valid`、`@NotBlank` 等）
+- 3️⃣ 画一张「前端请求 → Controller → Service → Mapper → DB」时序图（用文字或 mermaid）
 
+好，这三个我给你一次性全搞定，全部按 **苍穹外卖** 的写法来讲。
 
+---
+
+## 1️⃣ CategoryService & CategoryServiceImpl 逐行解释（含「有菜品/套餐不能删」）
+
+先给出 **接口 + 实现类完整代码**（接近苍穹原版），然后逐段讲。
+
+### 1.1 CategoryService 接口
+
+```java
+package com.sky.service;
+
+import com.sky.dto.CategoryDTO;
+import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
+import com.sky.result.PageResult;
+
+import java.util.List;
+
+public interface CategoryService {
+
+    /**
+     * 新增分类
+     */
+    void save(CategoryDTO categoryDTO);
+
+    /**
+     * 分类分页查询
+     */
+    PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO);
+
+    /**
+     * 根据id删除分类
+     */
+    void deleteById(Long id);
+
+    /**
+     * 修改分类
+     */
+    void update(CategoryDTO categoryDTO);
+
+    /**
+     * 启用、禁用分类
+     */
+    void startOrStop(Integer status, Long id);
+
+    /**
+     * 根据类型查询分类
+     */
+    List<Category> list(Integer type);
+}
+```
+
+**解释：**
+
+* 这是 Service 层接口，只定义「要做什么」，不写具体实现。
+* 对应你 Controller 里的所有方法：
+
+  * `save` → 新增分类
+  * `pageQuery` → 分页查询
+  * `deleteById` → 删除分类（带业务校验）
+  * `update` → 修改分类
+  * `startOrStop` → 启用 / 禁用
+  * `list` → 根据类型查询
+
+---
+
+### 1.2 CategoryServiceImpl 实现类（苍穹外卖风格）
+
+```java
+package com.sky.service.impl;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.CategoryDTO;
+import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
+import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealMapper;
+import com.sky.result.PageResult;
+import com.sky.service.CategoryService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class CategoryServiceImpl implements CategoryService {
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetmealMapper setmealMapper;
+
+    /**
+     * 新增分类
+     */
+    @Override
+    public void save(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        // DTO -> Entity 属性拷贝
+        BeanUtils.copyProperties(categoryDTO, category);
+
+        // 新增时默认禁用，等运营手动启用
+        category.setStatus(StatusConstant.DISABLE);
+
+        // 审计字段
+        LocalDateTime now = LocalDateTime.now();
+        category.setCreateTime(now);
+        category.setUpdateTime(now);
+
+        Long currentUserId = BaseContext.getCurrentId();
+        category.setCreateUser(currentUserId);
+        category.setUpdateUser(currentUserId);
+
+        // 调用 Mapper 插入数据库
+        categoryMapper.insert(category);
+    }
+
+    /**
+     * 分类分页查询
+     */
+    @Override
+    public PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
+        // 1. 设置分页参数（PageHelper 会拦截后续的 SQL）
+        PageHelper.startPage(categoryPageQueryDTO.getPage(), categoryPageQueryDTO.getPageSize());
+
+        // 2. 执行 Mapper 的分页查询（返回 Page 对象）
+        Page<Category> page = categoryMapper.pageQuery(categoryPageQueryDTO);
+
+        // 3. 组装为通用的 PageResult
+        long total = page.getTotal();
+        List<Category> records = page.getResult();
+
+        return new PageResult(total, records);
+    }
+
+    /**
+     * 根据id删除分类（有菜品/套餐不能删）
+     */
+    @Override
+    public void deleteById(Long id) {
+        // 1. 先查该分类下是否有菜品
+        Integer count = dishMapper.countByCategoryId(id);
+        if (count != null && count > 0) {
+            // 有菜品，不能删，抛业务异常
+            throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
+        }
+
+        // 2. 再查该分类下是否有套餐
+        count = setmealMapper.countByCategoryId(id);
+        if (count != null && count > 0) {
+            // 有套餐，不能删
+            throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
+        }
+
+        // 3. 都没有关联，才真正删除
+        categoryMapper.deleteById(id);
+    }
+
+    /**
+     * 修改分类
+     */
+    @Override
+    public void update(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO, category);
+
+        // 只更新修改时间和修改人
+        category.setUpdateTime(LocalDateTime.now());
+        category.setUpdateUser(BaseContext.getCurrentId());
+
+        categoryMapper.update(category);
+    }
+
+    /**
+     * 启用、禁用分类
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Category category = Category.builder()
+                .id(id)
+                .status(status)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+        categoryMapper.update(category);
+    }
+
+    /**
+     * 根据类型查询分类
+     */
+    @Override
+    public List<Category> list(Integer type) {
+        return categoryMapper.list(type);
+    }
+}
+```
+
+`deleteById` 逻辑与苍穹外卖官方教程一致：先查菜品，再查套餐，有就抛业务异常，没有才删。([CSDN Blog][1])
+
+---
+
+### 1.3 逐段解释重点（尤其删除逻辑）
+
+#### （1）类和成员
+
+```java
+@Service
+public class CategoryServiceImpl implements CategoryService {
+```
+
+* `@Service`：声明这是 Service 层 Bean，交给 Spring 管理。
+* `implements CategoryService`：实现刚才那个接口。
+
+```java
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetmealMapper setmealMapper;
+```
+
+* 在苍穹外卖里，**分类删除要查两张表**：
+
+  * `dish` 表（菜品）
+  * `setmeal` 表（套餐）
+* 所以这里注入三个 Mapper，负责操作三张表：
+
+---
+
+#### （2）save：新增分类
+
+```java
+public void save(CategoryDTO categoryDTO) {
+    Category category = new Category();
+    BeanUtils.copyProperties(categoryDTO, category);
+```
+
+* 创建实体对象 `Category`
+* 用 `BeanUtils.copyProperties` 把 DTO 中的相同字段拷贝进去（减少 setter）
+
+```java
+    category.setStatus(StatusConstant.DISABLE);
+```
+
+* 新增分类默认**禁用状态**（运营手动启用）
+* `StatusConstant.DISABLE` 一般是 0
+
+```java
+    LocalDateTime now = LocalDateTime.now();
+    category.setCreateTime(now);
+    category.setUpdateTime(now);
+```
+
+* 记录创建时间 & 修改时间（刚新增，所以相同）
+
+```java
+    Long currentUserId = BaseContext.getCurrentId();
+    category.setCreateUser(currentUserId);
+    category.setUpdateUser(currentUserId);
+```
+
+* 从 `BaseContext`（ThreadLocal）获取当前登录员工 id
+* 写入创建人 / 修改人（审计字段）
+
+```java
+    categoryMapper.insert(category);
+}
+```
+
+* 调用 Mapper，插入数据库 `category` 表
+
+---
+
+#### （3）pageQuery：分页查询
+
+```java
+PageHelper.startPage(categoryPageQueryDTO.getPage(), categoryPageQueryDTO.getPageSize());
+Page<Category> page = categoryMapper.pageQuery(categoryPageQueryDTO);
+```
+
+* 用 PageHelper 这个插件：
+
+  * `startPage` 会对后面的 SQL 做拦截，自动加 `limit` 等分页语句
+* `categoryMapper.pageQuery(dto)` 实际执行一条 SELECT，返回 Page 对象
+
+```java
+long total = page.getTotal();
+List<Category> records = page.getResult();
+return new PageResult(total, records);
+```
+
+* 从 Page 里拿出：
+
+  * `total` 总条数
+  * `result` 当前页数据
+* 封装到统一的 `PageResult`，Controller 再返回 `Result<PageResult>`
+
+---
+
+#### （4）deleteById：有菜品/套餐不能删（重点）
+
+```java
+public void deleteById(Long id) {
+    // 1. 先查该分类下是否有菜品
+    Integer count = dishMapper.countByCategoryId(id);
+    if (count != null && count > 0) {
+        // 有菜品，不能删，抛业务异常
+        throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
+    }
+```
+
+**逻辑解释：**
+
+* 先查 `dish` 表中 `category_id = id` 的数量：
+
+  * Mapper 中 SQL 大概是：
+    `SELECT COUNT(*) FROM dish WHERE category_id = #{id}`
+* 如果 `count > 0`，说明这个分类底下有菜品：
+
+  * 直接抛出 `DeletionNotAllowedException`
+  * `MessageConstant.CATEGORY_BE_RELATED_BY_DISH` 一般是 `"当前分类关联了菜品，不能删除"`
+* 抛异常后，后面代码不会执行，Spring 全局异常处理会把它转换成统一的错误响应（比如 code=0, msg="当前分类关联了菜品，不能删除"）
+
+```java
+    // 2. 再查该分类下是否有套餐
+    count = setmealMapper.countByCategoryId(id);
+    if (count != null && count > 0) {
+        // 有套餐，不能删
+        throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
+    }
+```
+
+* 如果分类没关联菜品，再查套餐表 `setmeal`：
+
+  * SQL 类似：
+    `SELECT COUNT(*) FROM setmeal WHERE category_id = #{id}`
+* 有套餐同样抛异常，提示「当前分类关联了套餐，不能删除」
+
+```java
+    // 3. 都没有关联，才真正删除
+    categoryMapper.deleteById(id);
+}
+```
+
+* 「除了上面两种情况」，说明：
+
+  * 分类没有关联菜品
+  * 分类没有关联套餐
+* 才执行真正删除：
+
+  * SQL：`DELETE FROM category WHERE id = #{id}`
+
+**为什么要这样设计？（面试可以说）**
+
+* 保护数据完整性：
+  防止删了分类，菜品/套餐还在，但指向一个不存在的分类。
+* 符合真实业务：
+  一个「川菜」分类下面有很多菜，不可能让运营一键删掉分类导致前台挂掉。
+* 通过业务异常 + 全局异常处理，把「不能删」做成用户友好的提示：
+  而不是 500 服务器错误。
+
+---
+
+#### （5）update：修改分类
+
+```java
+public void update(CategoryDTO categoryDTO) {
+    Category category = new Category();
+    BeanUtils.copyProperties(categoryDTO, category);
+
+    category.setUpdateTime(LocalDateTime.now());
+    category.setUpdateUser(BaseContext.getCurrentId());
+
+    categoryMapper.update(category);
+}
+```
+
+* DTO → Entity 拷贝
+* 更新修改时间和修改人
+* 调用 `categoryMapper.update` 执行 `UPDATE category SET ... WHERE id = ?`
+
+---
+
+#### （6）startOrStop：启用/禁用
+
+```java
+public void startOrStop(Integer status, Long id) {
+    Category category = Category.builder()
+            .id(id)
+            .status(status)
+            .updateTime(LocalDateTime.now())
+            .updateUser(BaseContext.getCurrentId())
+            .build();
+
+    categoryMapper.update(category);
+}
+```
+
+* 只构建了部分字段：id / status / updateTime / updateUser
+* 这种写法在 MyBatis 中一般是动态 SQL：只更新非空字段
+* 用于「上架 / 下架某分类」
+
+---
+
+#### （7）list：根据类型查询
+
+```java
+public List<Category> list(Integer type) {
+    return categoryMapper.list(type);
+}
+```
+
+* 根据 `type` 查分类：
+  比如：
+
+  * 1 = 菜品分类
+  * 2 = 套餐分类
+* 前端：新增菜品页面、套餐页面，下拉框用的就是这个接口。
+
+---
+
+## 2️⃣ 带校验注解的 Controller 改造版（@Valid, @Validated）
+
+你原来的 `CategoryController` 已经很标准了，我们只在上面「加上参数校验」。
+
+### 2.1 先假设 CategoryDTO 上已经加了字段校验（推荐）
+
+**CategoryDTO 示例（参考）**
+
+```java
+package com.sky.dto;
+
+import lombok.Data;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Data
+public class CategoryDTO {
+
+    private Long id;
+
+    @NotBlank(message = "分类名称不能为空")
+    private String name;
+
+    @NotNull(message = "分类类型不能为空")
+    private Integer type;
+
+    @NotNull(message = "排序值不能为空")
+    @Min(value = 0, message = "排序值不能为负数")
+    private Integer sort;
+}
+```
+
+这样，Controller 只要加上 `@Valid`，就能对请求体做校验。
+
+---
+
+### 2.2 加上校验注解后的 CategoryController
+
+```java
+package com.sky.controller.admin;
+
+import com.sky.dto.CategoryDTO;
+import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
+import com.sky.result.PageResult;
+import com.sky.result.Result;
+import com.sky.service.CategoryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * 分类管理
+ */
+@RestController
+@RequestMapping("/admin/category")
+@Api(tags = "分类相关接口")
+@Slf4j
+@Validated // 开启对方法参数（如 @NotNull）的校验
+public class CategoryController {
+
+    @Autowired
+    private CategoryService categoryService;
+
+    /**
+     * 新增分类
+     */
+    @PostMapping
+    @ApiOperation("新增分类")
+    public Result<String> save(@Valid @RequestBody CategoryDTO categoryDTO) {
+        log.info("新增分类：{}", categoryDTO);
+        categoryService.save(categoryDTO);
+        return Result.success();
+    }
+
+    /**
+     * 分类分页查询
+     */
+    @GetMapping("/page")
+    @ApiOperation("分类分页查询")
+    public Result<PageResult> page(@Valid CategoryPageQueryDTO categoryPageQueryDTO) {
+        log.info("分页查询：{}", categoryPageQueryDTO);
+        PageResult pageResult = categoryService.pageQuery(categoryPageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 删除分类
+     */
+    @DeleteMapping
+    @ApiOperation("删除分类")
+    public Result<String> deleteById(@NotNull(message = "分类id不能为空")
+                                     @RequestParam Long id) {
+        log.info("删除分类：{}", id);
+        categoryService.deleteById(id);
+        return Result.success();
+    }
+
+    /**
+     * 修改分类
+     */
+    @PutMapping
+    @ApiOperation("修改分类")
+    public Result<String> update(@Valid @RequestBody CategoryDTO categoryDTO) {
+        log.info("修改分类：{}", categoryDTO);
+        categoryService.update(categoryDTO);
+        return Result.success();
+    }
+
+    /**
+     * 启用、禁用分类
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用分类")
+    public Result<String> startOrStop(@PathVariable("status")
+                                      @NotNull(message = "状态不能为空") Integer status,
+                                      @NotNull(message = "分类id不能为空")
+                                      @RequestParam Long id) {
+        log.info("修改分类状态，id={}，status={}", id, status);
+        categoryService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据类型查询分类
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据类型查询分类")
+    public Result<List<Category>> list(@RequestParam(required = false) Integer type) {
+        List<Category> list = categoryService.list(type);
+        return Result.success(list);
+    }
+}
+```
+
+**关键点解释：**
+
+* `@Validated`：
+  加在类上，开启对「方法参数注解」的校验，比如 `@NotNull`。
+* `@Valid @RequestBody CategoryDTO`：
+  对请求体里的 JSON 进行 Bean 校验（用 DTO 上的注解）。
+* `@NotNull + @RequestParam`：
+  确保 `id` 这种关键参数不能缺失。
+* 校验失败会抛出 `MethodArgumentNotValidException` 或 `ConstraintViolationException`，
+  苍穹项目里一般会在全局异常处理里统一转成前端友好的错误 JSON。
+
+---
+
+## 3️⃣「前端 → Controller → Service → Mapper → DB」流程图（苍穹删除分类为例）
+
+用 **Mermaid 时序图** 描述「删除分类」的完整链路，你可以直接放 README 或笔记中渲染。
+
+> 例子：前端点击「删除分类」，后端要检查「是否有关联菜品/套餐」，再决定是否可以删。
+
+```mermaid
+sequenceDiagram
+    participant FE as 前端（管理端 Vue）
+    participant C as CategoryController
+    participant S as CategoryServiceImpl
+    participant DM as DishMapper
+    participant SM as SetmealMapper
+    participant CM as CategoryMapper
+    participant DB as MySQL 数据库
+
+    FE->>C: DELETE /admin/category?id=3
+    C->>S: deleteById(3)
+
+    Note over S: 第一步：检查该分类下是否有菜品
+    S->>DM: countByCategoryId(3)
+    DM->>DB: SELECT COUNT(*) FROM dish WHERE category_id = 3
+    DB-->>DM: 返回菜品数量 countDish
+    DM-->>S: countDish
+
+    alt countDish > 0（有关联菜品）
+        S-->>C: 抛出 DeletionNotAllowedException(分类关联菜品)
+        C-->>FE: 返回 Result.error(\"当前分类关联了菜品，不能删除\")
+    else countDish == 0（无菜品）
+        Note over S: 第二步：检查该分类下是否有套餐
+        S->>SM: countByCategoryId(3)
+        SM->>DB: SELECT COUNT(*) FROM setmeal WHERE category_id = 3
+        DB-->>SM: 返回套餐数量 countSetmeal
+        SM-->>S: countSetmeal
+
+        alt countSetmeal > 0（有关联套餐）
+            S-->>C: 抛出 DeletionNotAllowedException(分类关联套餐)
+            C-->>FE: 返回 Result.error(\"当前分类关联了套餐，不能删除\")
+        else countSetmeal == 0（无套餐）
+            Note over S: 第三步：真正删除分类
+            S->>CM: deleteById(3)
+            CM->>DB: DELETE FROM category WHERE id = 3
+            DB-->>CM: 执行成功
+            CM-->>S: 删除成功
+            S-->>C: 正常返回
+            C-->>FE: Result.success()
+        end
+    end
+```
+
+**怎么讲这个图（面试视角）：**
+
+* 前端只发一个删除请求：`DELETE /admin/category?id=3`
+* Controller 不写业务逻辑，只调用 `categoryService.deleteById`
+* Service 里先后调用两个 Mapper：
+
+  * `DishMapper.countByCategoryId` → 查菜品数量
+  * `SetmealMapper.countByCategoryId` → 查套餐数量
+* 只要有一种关联数据，就抛业务异常 → 被全局异常处理成统一错误 JSON 返回。
+* 没有关联时，才调用 `CategoryMapper.deleteById` 执行真正的 DELETE。
+
+---
+
+如果你愿意，下一步我可以帮你：
+
+* 把 **CategoryMapper / DishMapper / SetmealMapper 的方法 + SQL** 也写出来并逐行讲
+* 或者按苍穹风格，给你做一整套「分类管理模块」的 **README 大纲**（Controller + Service + Mapper + SQL + 接口文档）。
+
+[1]: https://blog.csdn.net/qq_62006367/article/details/132657800?utm_source=chatgpt.com "项目实战——苍穹外卖(Day2) 原创"
+
+好，你是想要一种**不用 Mermaid、画图工具也能直接展示的版本**，比如可以在：
+
+* 记事本
+* 微信
+* 控制台
+* Markdown 普通文本
+
+里直接粘贴就能看的那种 ✔️
+
+我给你三种选择（任选复制）：
+
+---
+
+# ✅ 方案一：ASCII 文本流程图（推荐，最通用）
+
+```
+┌───────────────────────────────┐
+│  前端：点击“删除分类”按钮        │
+└───────────────┬───────────────┘
+                │ 发送请求
+                ▼
+        DELETE /admin/category?id=3
+                │
+                ▼
+┌───────────────────────────────┐
+│  CategoryController.deleteById │
+└───────────────┬───────────────┘
+                │ 调用
+                ▼
+┌───────────────────────────────┐
+│      CategoryServiceImpl       │
+└───────────────┬───────────────┘
+                │
+                │ 第一步：检查是否有关联菜品
+                ▼
+┌───────────────────────────────┐
+│      DishMapper.count(...)     │
+└───────────────┬───────────────┘
+                │
+                ▼
+          SELECT COUNT(*) 
+            FROM dish 
+         WHERE category_id = 3
+
+                │
+        ┌───────┴──────────────────────┐
+        │ count > 0 ?                   │
+        └───────────────┬──────────────┘
+                        │是
+                        ▼
+             ❌ 抛异常：分类被菜品关联
+             ❌ 不能删除
+             ❌ 返回错误信息
+                        │
+                        └── 结束
+
+                        │否
+                        ▼
+第二步：检查是否有关联套餐
+
+┌───────────────────────────────┐
+│    SetmealMapper.count(...)   │
+└───────────────┬───────────────┘
+                │
+                ▼
+          SELECT COUNT(*) 
+           FROM setmeal 
+        WHERE category_id = 3
+
+                │
+        ┌───────┴──────────────────────┐
+        │ count > 0 ?                   │
+        └───────────────┬──────────────┘
+                        │是
+                        ▼
+             ❌ 抛异常：分类被套餐关联
+             ❌ 不能删除
+             ❌ 返回错误信息
+                        │
+                        └── 结束
+
+                        │否
+                        ▼
+第三步：真正执行删除
+
+┌───────────────────────────────┐
+│    CategoryMapper.deleteById   │
+└───────────────┬───────────────┘
+                │
+                ▼
+      DELETE FROM category 
+        WHERE id = 3
+
+                │
+                ▼
+           ✔ 删除成功
+           ✔ 返回 Result.success()
+```
+
+---
+
+# ✅ 方案二：极简步骤版（适合文档 / 面试口述）
+
+```
+前端发起请求：
+    DELETE /admin/category?id=3
+
+Controller：
+    调用 categoryService.deleteById(3)
+
+Service 执行三步：
+
+1）检查是否有关联菜品
+    SELECT COUNT(*) FROM dish WHERE category_id = 3
+    如果 count > 0
+        抛异常：分类被菜品关联，不能删除
+
+2）检查是否有关联套餐
+    SELECT COUNT(*) FROM setmeal WHERE category_id = 3
+    如果 count > 0
+        抛异常：分类被套餐关联，不能删除
+
+3）执行删除
+    DELETE FROM category WHERE id = 3
+
+返回：
+    删除成功 → Result.success()
+    失败 → Result.error("当前分类关联了菜品/套餐，不能删除")
+```
+
+---
+
+# ✅ 方案三：表格版（适合 README.md）
+
+| 阶段          | 行为                          | 说明         |
+| ----------- | --------------------------- | ---------- |
+| 前端          | 点击删除按钮                      | 传入分类 id    |
+| HTTP        | DELETE /admin/category?id=3 | Restful 风格 |
+| Controller  | 调用 service.deleteById       | 不写业务       |
+| Service 第一步 | 查 dish 表                    | 分类是否关联菜品   |
+| 判断1         | count > 0                   | 抛异常，不能删    |
+| Service 第二步 | 查 setmeal 表                 | 分类是否关联套餐   |
+| 判断2         | count > 0                   | 抛异常，不能删    |
+| Service 第三步 | deleteById                  | 真正删除       |
+| Mapper      | 执行 SQL                      | 作用数据库      |
+| 返回          | Result.success()            | 删除成功       |
+
+---
+
+👉 你可以告诉我：
+
+* 要不要我帮你**把这些整理成完整 GitHub README 模块**
+* 或者要不要继续：
+
+  * ✔ DishMapper / SetmealMapper SQL
+  * ✔ MyBatis XML 写法
+  * ✔ GlobalExceptionHandler 捕获业务异常
+  * ✔ 前端删除按钮 + 弹窗确认 + 提示信息
